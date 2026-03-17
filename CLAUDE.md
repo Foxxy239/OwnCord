@@ -7,6 +7,69 @@ OwnCord is a self-hosted Windows chat platform with two
 components: a Go server (`chatserver.exe`) and a Tauri v2
 desktop client (Rust + TypeScript).
 
+## Project Brain
+
+This project uses an Obsidian vault at `docs/brain/`
+as the single source of truth for project state.
+Read and write to it during every session.
+
+### On Session Start
+
+1. Read `docs/brain/Dashboard.md` to get oriented
+2. Read `docs/brain/02-Tasks/In Progress.md` to see what's active
+3. Read `docs/brain/05-Bugs/Open Bugs.md` to see outstanding bugs
+4. Create a session log at
+   `docs/brain/03-Sessions/YYYY-MM-DD-summary.md`
+   using `docs/brain/Templates/Session Log.md`
+
+### On Session End
+
+1. Update the session log with everything that was done
+2. Move completed tasks from `In Progress.md` to `Done.md`
+3. Update `In Progress.md` with any newly started but unfinished work
+4. If any architectural decisions were made, log them in `docs/brain/04-Decisions/`
+
+### Task Management
+
+- Tasks live in `docs/brain/02-Tasks/` across files:
+  `Backlog.md`, `In Progress.md`, `Done.md`
+- Format: `- [ ] **T-XXX:** Description` (use incrementing IDs)
+- When starting a task, move it from Backlog → In Progress
+- When finishing, check the box and move it from
+  In Progress → Done with a completion date
+- New tasks discovered during work go into Backlog under the appropriate priority
+
+### Decision Logging
+
+- Any significant technical choice (library, arch,
+  protocol, trade-off) gets a decision record
+- Use template at `docs/brain/Templates/Decision.md`
+- Save as `docs/brain/04-Decisions/DEC-XXX-short-title.md` (incrementing IDs)
+- Statuses: `proposed` → `accepted` | `rejected` | `superseded`
+
+### Bug Tracking
+
+- Use template at `docs/brain/Templates/Bug Report.md`
+- Save as `docs/brain/05-Bugs/BUG-XXX-short-title.md` (incrementing IDs)
+- Update `docs/brain/05-Bugs/Open Bugs.md` — add to
+  Active, move to Resolved when fixed
+- Statuses: `open` → `investigating` → `fixed` | `wontfix`
+
+### Requirements & Architecture
+
+- When requirements change or are discovered, update `docs/brain/00-Overview/Requirements.md`
+- When architecture evolves, update `docs/brain/01-Architecture/Design.md`
+- When dependencies change, update `docs/brain/01-Architecture/Tech Stack.md`
+- Always log the *reason* for changes via a decision record
+
+### Conventions
+
+- Use `[[wiki-links]]` for cross-references between vault files
+- Use ISO dates: `YYYY-MM-DD`
+- Replace `{{date}}` in templates with the actual date
+- Keep files concise — prefer bullet points over prose
+- Do NOT delete old session logs or decisions — they are the project history
+
 ## Codex CLI - Code REVIEW
 
 After builds, run Codex for a second opinion:
@@ -15,6 +78,8 @@ codex exec --sandbox read-only \
 "Review for bugs and logic errors"
 
 ## Reference Files (read before implementing)
+
+All specs live in `docs/brain/06-Specs/`:
 
 - **CHATSERVER.md** -- Master spec: phases, tasks, security
   priorities, Windows-specific details.
@@ -120,13 +185,13 @@ go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 - **Status values**: Only `online`, `idle`, `dnd`,
   `offline`. Never `invisible`.
 
-## Conventions & Details (see canonical files)
+## Conventions & Details (see canonical files in docs/brain/)
 
 - **Client architecture & conventions**:
-  CLIENT-ARCHITECTURE.md
-- **Server spec & conventions**: CHATSERVER.md
-- **Security rules**: CHATSERVER.md (Security section)
-- **Testing requirements**: TESTING-STRATEGY.md
+  06-Specs/CLIENT-ARCHITECTURE.md
+- **Server spec & conventions**: 06-Specs/CHATSERVER.md
+- **Security rules**: 06-Specs/CHATSERVER.md (Security section)
+- **Testing requirements**: 06-Specs/TESTING-STRATEGY.md
 - **Coverage target**: 80%+ (TDD: RED → GREEN → IMPROVE)
 
 ## gstack Skills
@@ -149,65 +214,3 @@ Available skills:
 - `/setup-browser-cookies` — Configure browser cookies
 - `/retro` — Retrospective
 - `/document-release` — Document a release
-
-## Zettelkasten Knowledge Base (Obsidian)
-
-## Vault Location
-
-`D:\Local-Lab\Coding\Repos\OwnCord\Obsidian-Brain\BIGBRAIN`
-
-## When to Write Notes
-
-After completing any meaningful task, create or update
-a Zettelkasten note capturing the insight.
-
-## Folder Structure
-
-```text
-BIGBRAIN/
-├── 0-inbox/          # Fleeting notes, quick captures
-├── 1-zettel/         # Permanent atomic notes (the core)
-├── 2-projects/       # Project-specific MOCs (Maps of Content)
-├── 3-resources/      # Reference material, snippets, configs
-└── templates/        # Note templates
-```
-
-## Note Format
-
-Every note in `1-zettel/` uses this template:
-
-```markdown
----
-id: {{YYYYMMDDHHMMSS}}
-title: "Short descriptive title"
-tags: [tag1, tag2]
-created: {{YYYY-MM-DD}}
----
-
-# {{title}}
-
-One atomic idea expressed clearly in a few paragraphs.
-
-## Context
-Why this matters or when it applies.
-
-## Related
-- [[link-to-related-note]]
-- [[another-related-note]]
-```
-
-## Rules
-
-1. **Atomic**: One idea per note. Split if covering
-   two concepts.
-2. **Linked**: Add `[[wikilinks]]` to related notes.
-   Search the vault first.
-3. **Own words**: Write in plain language, not
-   copy-paste from docs.
-4. **ID as filename**: Use
-   `{{YYYYMMDDHHMMSS}}-short-slug.md`.
-5. **Inbox first**: If unsure, drop in `0-inbox/`.
-6. **Project MOCs**: Each project gets a MOC in
-   `2-projects/` linking relevant zettels.
-7. **Search before creating**: Search existing notes
-   to avoid duplicates.
