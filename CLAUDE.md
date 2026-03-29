@@ -190,6 +190,10 @@ npm run test:e2e:prod                # Playwright E2E (prod build)
 npm run test:e2e:ui                  # Playwright UI mode
 npm run test:watch                   # watch mode for tests
 npm run test:coverage                # coverage report
+
+# Linting
+npm run lint                         # ESLint check (src/)
+npm run lint:fix                     # ESLint auto-fix
 ```
 
 ### Dev Tools
@@ -332,7 +336,23 @@ In QA mode, flag any code that doesn't match DESIGN.md.
 - **Rate limiting**: Client must respect PROTOCOL.md
   limits (typing 1/3s, presence 1/10s, voice 20/s)
 - **Status values**: Only `online`, `idle`, `dnd`,
-  `offline`. Never `invisible`.
+  `offline`. Never `invisible`. Server validates against
+  this allowlist in `handlers_presence.go`.
+- **Username rules**: 2-32 runes, printable only, no
+  control chars. Enforced by `auth.ValidateUsername()` in
+  both registration and admin setup.
+- **Backup path security**: All backup handlers use
+  `filepath.Abs` + prefix check (not just string-contains)
+  to prevent path traversal on Windows.
+- **SSE auth**: Admin log stream uses single-use tickets
+  (30s TTL) via `POST /admin/api/logs/ticket`, NOT tokens
+  in URL query parameters.
+- **Third-party fetches**: `acceptInvalidCerts: true` is
+  ONLY for server URLs. Third-party fetches (OG previews,
+  external images) must use `acceptInvalidCerts: false`.
+- **Content-Type validation**: Data URIs from remote
+  fetches must validate MIME type against `SAFE_MIME_TYPES`
+  allowlist before construction.
 - **Tenor API key**: The key in `lib/tenor.ts` is Google's
   public anonymous key — not a secret. Do not move to env.
 - **DM authorization**: DM channels use `IsDMParticipant`
