@@ -244,6 +244,10 @@ npm run test:e2e:ui                  # Playwright UI mode
 npm run test:watch                   # watch mode for tests
 npm run test:coverage                # coverage report
 
+# Type checking
+npm run typecheck                    # full typecheck (all sources)
+npm run typecheck:build              # typecheck build-only tsconfig
+
 # Linting
 npm run lint                         # ESLint check (src/)
 npm run lint:fix                     # ESLint auto-fix
