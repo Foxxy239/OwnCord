@@ -6,7 +6,7 @@ How to set up the development environment and contribute to OwnCord.
 
 ### Prerequisites
 
-- **Windows 10+** (x64)
+- **Linux** (x86_64) or **Windows 10+** (x64)
 - **Go 1.22+** (server)
 - **Node.js 20+** (client)
 - **Rust / Cargo** (Tauri client)
@@ -17,7 +17,8 @@ How to set up the development environment and contribute to OwnCord.
 
 | Command | Description |
 |---------|-------------|
-| `go build -o chatserver.exe -ldflags "-s -w" .` | Build server binary |
+| `go build -o chatserver -ldflags "-s -w" .` | Build server binary (Linux/macOS) |
+| `go build -o chatserver.exe -ldflags "-s -w" .` | Build server binary (Windows) |
 | `go test ./...` | Run all server tests |
 | `go test ./... -cover` | Run server tests with coverage |
 | `go test -race ./...` | Run server tests with race detection |
@@ -28,8 +29,9 @@ How to set up the development environment and contribute to OwnCord.
 |---------|-------------|
 | `npm run dev` | Start Vite dev server with hot reload |
 | `npm run build` | TypeScript check + Vite production build |
-| `npm run tauri dev` | Launch Tauri app in dev mode |
-| `npm run tauri build` | Build release installer |
+| `npm run tauri:dev` | Launch Tauri app in dev mode |
+| `npm run tauri:build:linux` | Build Linux bundles (DEB + AppImage) |
+| `npm run tauri:build:windows` | Build Windows NSIS installer |
 | `npm test` | Run all tests (vitest) |
 | `npm run test:unit` | Unit tests only |
 | `npm run test:integration` | Integration tests only |

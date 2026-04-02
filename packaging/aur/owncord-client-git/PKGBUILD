@@ -1,0 +1,68 @@
+# Maintainer: J3vb
+
+pkgname=owncord-client-git
+pkgver=0.0.0.r0.g0000000
+pkgrel=1
+pkgdesc="OwnCord desktop client (development version)"
+arch=('x86_64' 'aarch64')
+url="https://github.com/J3vb/OwnCord"
+license=('AGPL-3.0-or-later')
+depends=('glib2' 'gtk3' 'hicolor-icon-theme' 'libayatana-appindicator' 'webkit2gtk-4.1')
+makedepends=('cargo' 'git' 'nodejs' 'npm' 'rust')
+provides=('owncord-client')
+conflicts=('owncord-client')
+source=(
+  "git+https://github.com/J3vb/OwnCord.git"
+  "owncord-client.desktop"
+)
+sha256sums=(
+  'SKIP'
+  'SKIP'
+)
+
+pkgver() {
+  cd "${srcdir}/OwnCord"
+
+  local base_tag
+  base_tag="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+  base_tag="${base_tag#v}"
+  if [[ -z "${base_tag}" ]]; then
+    base_tag="0.0.0"
+  fi
+
+  printf '%s.r%s.g%s' \
+    "${base_tag}" \
+    "$(git rev-list --count HEAD)" \
+    "$(git rev-parse --short=7 HEAD)"
+}
+
+prepare() {
+  cd "${srcdir}/OwnCord/Client/tauri-client"
+  npm ci --cache "${srcdir}/npm-cache"
+}
+
+build() {
+  cd "${srcdir}/OwnCord/Client/tauri-client"
+
+  npm run build
+
+  cd src-tauri
+  cargo build --release --locked
+}
+
+package() {
+  cd "${srcdir}/OwnCord"
+
+  install -Dm755 \
+    "Client/tauri-client/src-tauri/target/release/owncord-client" \
+    "${pkgdir}/usr/bin/owncord-client"
+
+  install -Dm644 "${srcdir}/owncord-client.desktop" \
+    "${pkgdir}/usr/share/applications/owncord-client.desktop"
+
+  install -Dm644 \
+    "Client/tauri-client/src-tauri/icons/128x128.png" \
+    "${pkgdir}/usr/share/icons/hicolor/128x128/apps/owncord-client.png"
+
+  install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

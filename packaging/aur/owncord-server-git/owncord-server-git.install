@@ -1,0 +1,20 @@
+post_install() {
+  if command -v systemd-sysusers >/dev/null 2>&1; then
+    systemd-sysusers /usr/lib/sysusers.d/owncord-server.conf >/dev/null 2>&1 || true
+  fi
+
+  if command -v systemd-tmpfiles >/dev/null 2>&1; then
+    systemd-tmpfiles --create /usr/lib/tmpfiles.d/owncord-server.conf >/dev/null 2>&1 || true
+  fi
+
+  cat <<'EOF'
+==> OwnCord server was installed.
+==> Data directory: /var/lib/owncord
+==> Start command:
+==>   sudo systemctl enable --now owncord-server.service
+EOF
+}
+
+post_upgrade() {
+  post_install
+}

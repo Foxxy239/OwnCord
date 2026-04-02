@@ -1,7 +1,15 @@
 use serde::Serialize;
+
+#[cfg(windows)]
 use std::ptr;
+
+#[cfg(windows)]
 use windows::core::{PCWSTR, PWSTR};
+
+#[cfg(windows)]
 use windows::Win32::Foundation::ERROR_NOT_FOUND;
+
+#[cfg(windows)]
 use windows::Win32::Security::Credentials::{
     CredDeleteW, CredFree, CredReadW, CredWriteW, CREDENTIALW, CRED_FLAGS,
     CRED_PERSIST_LOCAL_MACHINE, CRED_TYPE_GENERIC,
@@ -27,12 +35,14 @@ impl std::fmt::Debug for CredentialData {
 }
 
 /// Build the target name used in Windows Credential Manager.
+#[cfg(windows)]
 fn target_name(host: &str) -> Vec<u16> {
     let name = format!("OwnCord/{host}");
     name.encode_utf16().chain(std::iter::once(0)).collect()
 }
 
 /// Encode a Rust string as a null-terminated UTF-16 vector.
+#[cfg(windows)]
 fn to_wide(s: &str) -> Vec<u16> {
     s.encode_utf16().chain(std::iter::once(0)).collect()
 }
@@ -50,6 +60,7 @@ fn to_wide(s: &str) -> Vec<u16> {
 /// The password field is only included when the user checks "Remember
 /// password". Windows Credential Manager encrypts the blob at rest using
 /// DPAPI, tied to the logged-in Windows user — plaintext is never on disk.
+#[cfg(windows)]
 #[tauri::command]
 pub fn save_credential(host: String, username: String, token: String, password: Option<String>) -> Result<(), String> {
     if host.is_empty() {
@@ -97,9 +108,17 @@ pub fn save_credential(host: String, username: String, token: String, password: 
     Ok(())
 }
 
+#[cfg(not(windows))]
+#[tauri::command]
+pub fn save_credential(host: String, username: String, token: String, password: Option<String>) -> Result<(), String> {
+    let _ = (host, username, token, password);
+    Err("credential storage is currently supported only on Windows builds".into())
+}
+
 /// Load a credential from Windows Credential Manager.
 ///
 /// Returns `None` when no credential exists for the given host.
+#[cfg(windows)]
 #[tauri::command]
 pub fn load_credential(host: String) -> Result<Option<CredentialData>, String> {
     if host.is_empty() {
@@ -167,7 +186,15 @@ pub fn load_credential(host: String) -> Result<Option<CredentialData>, String> {
     Ok(Some(CredentialData { username, token, password }))
 }
 
+#[cfg(not(windows))]
+#[tauri::command]
+pub fn load_credential(host: String) -> Result<Option<CredentialData>, String> {
+    let _ = host;
+    Ok(None)
+}
+
 /// Delete a credential from Windows Credential Manager.
+#[cfg(windows)]
 #[tauri::command]
 pub fn delete_credential(host: String) -> Result<(), String> {
     if host.is_empty() {
@@ -196,11 +223,18 @@ pub fn delete_credential(host: String) -> Result<(), String> {
     }
 }
 
+#[cfg(not(windows))]
+#[tauri::command]
+pub fn delete_credential(host: String) -> Result<(), String> {
+    let _ = host;
+    Ok(())
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
-#[cfg(test)]
+#[cfg(all(test, windows))]
 mod tests {
     use super::*;
 
@@ -248,5 +282,21 @@ mod tests {
         assert_eq!(*result.last().unwrap(), 0u16);
         // 3 CJK chars + null terminator = 4 elements
         assert_eq!(result.len(), 4);
+    }
+}
+
+#[cfg(all(test, not(windows)))]
+mod non_windows_tests {
+    use super::*;
+
+    #[test]
+    fn load_returns_none_on_non_windows() {
+        let result = load_credential("localhost:8443".to_string()).expect("load should not fail");
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn delete_is_noop_on_non_windows() {
+        delete_credential("localhost:8443".to_string()).expect("delete should not fail");
     }
 }

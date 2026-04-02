@@ -4,7 +4,7 @@ Get OwnCord up and running in minutes.
 
 ## Prerequisites
 
-- **Windows 10+** (x64)
+- **Linux** (x86_64) or **Windows 10+** (x64)
 - **Go 1.25+** (only if building the server from source)
 - **Node.js 20+** (only if building the client from source)
 - **Rust / Cargo** (only if building the Tauri client from source)
@@ -12,24 +12,31 @@ Get OwnCord up and running in minutes.
 
 ## Step 1: Download
 
-Get the latest release from GitHub Releases. Download `chatserver.exe` and the `OwnCord` installer.
+Get the latest release from GitHub Releases. Download the server binary for your OS
+(`chatserver` on Linux/macOS, `chatserver.exe` on Windows) and the `OwnCord` installer.
 
 Or build from source:
 
 ```bash
 # Server
 cd Server
-go build -o chatserver.exe -ldflags "-s -w -X main.version=1.0.0" .
+go build -o chatserver -ldflags "-s -w -X main.version=1.0.0" .
+
+# Windows build
+# go build -o chatserver.exe -ldflags "-s -w -X main.version=1.0.0" .
 
 # Client
 cd Client/tauri-client
 npm install
-npm run tauri build
+npm run tauri:build:linux
+
+# Windows build
+# npm run tauri:build:windows
 ```
 
 ## Step 2: Run the Server
 
-Run `chatserver.exe`. On first run:
+Run `./chatserver` (Linux/macOS) or `chatserver.exe` (Windows). On first run:
 
 1. `config.yaml` is created in the working directory with default settings
 2. `data/` directory is created for the database, TLS certs, uploads, and backups
@@ -62,5 +69,5 @@ If friends are outside your local network, see the [Port Forwarding Guide](port-
 ## Next Steps
 
 - [Server Configuration](server-configuration.md) -- customize ports, TLS, uploads, voice
-- [Deployment Guide](deployment.md) -- production hardening, backups, monitoring, Windows service setup
+- [Deployment Guide](deployment.md) -- production hardening, backups, monitoring
 - [LiveKit Setup](livekit-setup.md) -- enable voice and video chat

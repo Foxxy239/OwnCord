@@ -1,0 +1,19 @@
+[Unit]
+Description=OwnCord self-hosted chat server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=owncord
+Group=owncord
+WorkingDirectory=/var/lib/owncord
+ExecStart=/usr/bin/owncord-server
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=true
+PrivateTmp=true
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

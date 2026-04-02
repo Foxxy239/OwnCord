@@ -21,8 +21,9 @@ import { defineConfig } from "@playwright/test";
  * launched a fresh exe and logged in.
  *
  * Requirements:
- * - Built Tauri exe:  npm run tauri build
- * - Running server:   Server/chatserver.exe (or set OWNCORD_SERVER_URL)
+ * - Built Tauri exe:  npm run tauri:build
+ * - Running server:   Server/chatserver (Linux/macOS) or Server/chatserver.exe (Windows)
+ *                     (or set OWNCORD_SERVER_URL)
  *
  * Usage:  npm run test:e2e:native
  */

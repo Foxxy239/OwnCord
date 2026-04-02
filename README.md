@@ -11,7 +11,7 @@
 > **Early Alpha — Building in the Open**
 > OwnCord is under active development and is not production-ready. Do not use it for sensitive communications. Security hardening is in progress. Contributions and [security reports](https://github.com/J3vb/OwnCord/issues) are welcome.
 
-A self-hosted Windows chat platform with real-time messaging,
+A self-hosted chat platform with real-time messaging,
 voice/video, file sharing, and a web admin panel. Run your own
 server and keep everything under your control — zero cloud
 dependencies, works fully on LAN.
@@ -27,9 +27,11 @@ dependencies, works fully on LAN.
 
 ## Quick Start
 
-1. Download `chatserver.exe` and the OwnCord installer from
+1. Download the server binary for your OS (`chatserver` on Linux/macOS,
+   `chatserver.exe` on Windows) and the OwnCord installer from
    [GitHub Releases](https://github.com/J3vb/OwnCord/releases)
-2. Run `chatserver.exe` — generates `config.yaml` and a `data/`
+2. Run `./chatserver` (Linux/macOS) or `chatserver.exe` (Windows) —
+   generates `config.yaml` and a `data/`
    directory (database, TLS certs, uploads, backups) on first run
 3. Open `https://localhost:8443/admin` to create the Owner account
 4. Generate an invite code in the admin panel and share it
@@ -71,7 +73,7 @@ connection, then pins it for future sessions.
 - Voice activity detection with speaker indicators (pulsing green glow)
 - Connection quality indicator with expandable transport stats
 - Voice call duration timer (MM:SS / HH:MM:SS elapsed)
-- LiveKit server runs as a companion process alongside `chatserver.exe`
+- LiveKit server runs as a companion process alongside `chatserver`
 
 ### Direct Messages
 
@@ -128,11 +130,11 @@ connection, then pins it for future sessions.
 
 ### Desktop Client
 
-- Native Windows app built with Tauri v2
+- Native desktop app built with Tauri v2 (Windows and Linux)
 - System tray integration
 - Desktop notifications with taskbar flash and sound
 - In-app auto-update with progress notification
-- Credential storage via Windows Credential Manager
+- Credential storage via Windows Credential Manager (Windows)
 - Auto-login with saved credentials (one-click connect)
 - Custom emoji picker
 - Compact mode for information-dense layouts
@@ -152,9 +154,9 @@ Voice and video require [LiveKit Server](https://github.com/livekit/livekit/rele
    voice:
      livekit_api_key: "devkey"           # any string
      livekit_api_secret: "secret-min-32-characters-long!!"  # min 32 chars
-     livekit_binary: "C:/path/to/livekit-server.exe"
+     livekit_binary: "/path/to/livekit-server"
    ```
-3. Restart `chatserver.exe` — it auto-starts LiveKit as a
+3. Restart `chatserver` — it auto-starts LiveKit as a
    companion process
 
 ### Networking
@@ -234,13 +236,17 @@ OwnCord/
 - Go 1.25+
 - Node.js 20+
 - Rust (stable)
+- Linux (x86_64)
 - Windows 10/11
 
 ### Server
 
 ```bash
 cd Server
-go build -o chatserver.exe -ldflags "-s -w -X main.version=1.0.0" .
+go build -o chatserver -ldflags "-s -w -X main.version=1.0.0" .
+
+# Windows build
+# go build -o chatserver.exe -ldflags "-s -w -X main.version=1.0.0" .
 ```
 
 ### Client
@@ -248,10 +254,15 @@ go build -o chatserver.exe -ldflags "-s -w -X main.version=1.0.0" .
 ```bash
 cd Client/tauri-client
 npm install
-npm run tauri build
+npm run tauri:build:linux
+
+# Windows build
+# npm run tauri:build:windows
 ```
 
-The installer is output to
+Linux bundles are output to
+`Client/tauri-client/src-tauri/target/release/bundle/` (`deb/`, `appimage/`).
+Windows NSIS installers are output to
 `Client/tauri-client/src-tauri/target/release/bundle/nsis/`.
 
 ### Running Tests
@@ -348,7 +359,7 @@ See [Contributing Guide](docs/contributing.md) for details.
 | Database | SQLite (pure Go, embedded) |
 | Client | Tauri v2 (Rust + TypeScript) |
 | Voice/Video | LiveKit SFU (companion process) |
-| Build | NSIS installer, GitHub Actions CI |
+| Build | Tauri bundles (NSIS/DEB/AppImage), GitHub Actions CI |
 
 ## License
 

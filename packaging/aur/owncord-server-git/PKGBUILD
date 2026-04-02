@@ -1,0 +1,73 @@
+# Maintainer: J3vb
+
+pkgname=owncord-server-git
+pkgver=0.0.0.r0.g0000000
+pkgrel=1
+pkgdesc="Self-hosted OwnCord chat server (development version)"
+arch=('x86_64' 'aarch64')
+url="https://github.com/J3vb/OwnCord"
+license=('AGPL-3.0-or-later')
+depends=('ca-certificates' 'glibc')
+makedepends=('git' 'go')
+provides=('owncord-server')
+conflicts=('owncord-server')
+install="${pkgname}.install"
+source=(
+  "git+https://github.com/J3vb/OwnCord.git"
+  "owncord-server.service"
+  "owncord-server.sysusers"
+  "owncord-server.tmpfiles"
+)
+sha256sums=(
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+)
+
+pkgver() {
+  cd "${srcdir}/OwnCord"
+
+  local base_tag
+  base_tag="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+  base_tag="${base_tag#v}"
+  if [[ -z "${base_tag}" ]]; then
+    base_tag="0.0.0"
+  fi
+
+  printf '%s.r%s.g%s' \
+    "${base_tag}" \
+    "$(git rev-list --count HEAD)" \
+    "$(git rev-parse --short=7 HEAD)"
+}
+
+prepare() {
+  cd "${srcdir}/OwnCord/Server"
+  go mod download
+}
+
+build() {
+  cd "${srcdir}/OwnCord/Server"
+  export CGO_ENABLED=0
+  export GOFLAGS="-trimpath -mod=readonly"
+  go build -ldflags "-s -w -X main.version=${pkgver%%.r*}" -o chatserver .
+}
+
+check() {
+  cd "${srcdir}/OwnCord/Server"
+  go test ./... -run TestDoesNotExist
+}
+
+package() {
+  cd "${srcdir}/OwnCord"
+
+  install -Dm755 "Server/chatserver" "${pkgdir}/usr/bin/owncord-server"
+  install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+  install -Dm644 "${srcdir}/owncord-server.service" \
+    "${pkgdir}/usr/lib/systemd/system/owncord-server.service"
+  install -Dm644 "${srcdir}/owncord-server.sysusers" \
+    "${pkgdir}/usr/lib/sysusers.d/owncord-server.conf"
+  install -Dm644 "${srcdir}/owncord-server.tmpfiles" \
+    "${pkgdir}/usr/lib/tmpfiles.d/owncord-server.conf"
+}

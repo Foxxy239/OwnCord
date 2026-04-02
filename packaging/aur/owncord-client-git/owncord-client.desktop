@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=OwnCord
+Comment=OwnCord desktop chat client
+Exec=owncord-client
+Icon=owncord-client
+Terminal=false
+Categories=Network;Chat;
+StartupWMClass=OwnCord

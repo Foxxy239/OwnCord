@@ -1,5 +1,6 @@
 /**
- * Credential storage — wraps Tauri IPC commands for Windows Credential Manager.
+ * Credential storage — wraps Tauri IPC commands for native credential storage.
+ * Windows uses Credential Manager; non-Windows builds may return no-op results.
  * Falls back to no-op in non-Tauri environments (tests, browser).
  */
 
@@ -26,7 +27,7 @@ async function getInvoke(): Promise<
 }
 
 /**
- * Save a credential to Windows Credential Manager.
+ * Save a credential to native storage on supported platforms.
  * Target: OwnCord/{host}
  */
 export async function saveCredential(
@@ -50,7 +51,7 @@ export async function saveCredential(
 }
 
 /**
- * Load a credential from Windows Credential Manager.
+ * Load a credential from native storage on supported platforms.
  * Returns null if not found or Tauri unavailable.
  */
 export async function loadCredential(
@@ -80,7 +81,7 @@ export async function loadCredential(
 }
 
 /**
- * Delete a credential from Windows Credential Manager.
+ * Delete a credential from native storage on supported platforms.
  */
 export async function deleteCredential(host: string): Promise<boolean> {
   const invoke = await getInvoke();

@@ -1,5 +1,6 @@
-// OwnCord chat server — self-hosted, Windows-native.
-// Build: go build -o chatserver.exe -ldflags "-s -w -X main.version=1.0.0" .
+// OwnCord chat server — self-hosted and cross-platform.
+// Build (Linux/macOS): go build -o chatserver -ldflags "-s -w -X main.version=1.0.0" .
+// Build (Windows):     go build -o chatserver.exe -ldflags "-s -w -X main.version=1.0.0" .
 package main
 
 import (

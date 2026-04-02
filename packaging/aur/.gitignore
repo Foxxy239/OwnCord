@@ -1,0 +1,11 @@
+# Temporary makepkg artifacts
+**/OwnCord/
+**/src/
+**/pkg/
+
+# Built package outputs
+**/*.pkg.tar.*
+**/*.tar.zst
+
+# Local logs
+**/*.log
